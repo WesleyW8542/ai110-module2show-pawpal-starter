@@ -89,7 +89,10 @@ classDiagram
 **b. Design changes**
 
 - Did your design change during implementation?
+  - Yes. I started with a simple `Task` focus, then added explicit `Owner` and `Pet` classes to model constraints and preferences more clearly.
 - If yes, describe at least one change and why you made it.
+  - `Owner` initially included `email`, but I removed it because authentication/contact details are out of scope for a planning prototype; it simplified the data model and kept the focus on scheduling behavior.
+  - I added `ScheduledTask` to separate raw task definition from scheduled instances, which made conflict detection and timeline generation easier to reason about.
 
 ---
 
