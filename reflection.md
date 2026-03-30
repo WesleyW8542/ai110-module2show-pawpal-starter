@@ -125,14 +125,18 @@ classDiagram
 ## 3. AI Collaboration
 
 **a. How you used AI**
-
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+    - I used AI to help design the domain model and class interactions (Owner, Pet, Task, Scheduler, ScheduledTask).
+    - AI was helpful in suggesting algorithm patterns, especially priority-weighted scheduling and knapsack-style selection for limited available time.
 - What kinds of prompts or questions were most helpful?
+    - I used prompts to implement recurring task behavior, conflict detection, and Streamlit UI patterns.
 
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
+    - Initially, the AI solution suggested `mark_complete()` simply toggled complete state. I required a recurrence-aware return value to generate subsequent daily/weekly tasks, so I changed it to return a new task instance.
 - How did you evaluate or verify what the AI suggested?
+    - I wrote and ran unit tests (e.g., recurring task generation and schedule conflict detection) and used `python -m pytest` to confirm behavior after each change.
 
 ---
 
@@ -141,12 +145,22 @@ classDiagram
 **a. What you tested**
 
 - What behaviors did you test?
+    - Task completion and recurrence generation (`daily`/`weekly`).
+    - Pet CRUD task operations.
+    - Scheduler sorting, capacity selection, generation, conflict detection, and scoring.
+    - Streamlit display behavior for sorted tasks and warnings.
 - Why were these tests important?
+    - They ensure core scheduling logic works and the user workflow remains reliable under real constraints.
 
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
+    - 4/5: all tests pass, core behaviors covered, and additional edge cases are identified for future work.
 - What edge cases would you test next if you had more time?
+    - Zero or negative duration tasks.
+    - Invalid priority values.
+    - Simultaneous task start/end overlap in generate_plan.
+    - Very large task lists for performance.
 
 ---
 
@@ -155,11 +169,14 @@ classDiagram
 **a. What went well**
 
 - What part of this project are you most satisfied with?
+    - Implementing recurring task handling and conflict warnings made the scheduler practical and dependable.
 
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
+    - Add time windows (earliest/latest start), recurrence schedule on a calendar, and an optional optimization solver.
 
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+    - Incremental implementation with tests is crucial, and AI is a strong assistant when suggestions are validated and adapted to real requirements.

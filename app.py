@@ -99,14 +99,51 @@ st.divider()
 st.subheader("Build Schedule")
 if st.button("Generate schedule"):
     scheduler = Scheduler(owner=owner)
+
+    pending = scheduler.get_tasks_sorted()
+    if pending:
+        st.markdown("### Pending tasks sorted by deadline and priority")
+        st.table([
+            {
+                "Pet": next((p.name for p in owner.pets if t in p.tasks), "Unknown"),
+                "Title": t.title,
+                "Type": t.task_type,
+                "Duration": t.duration_minutes,
+                "Priority": t.priority,
+                "Deadline": t.deadline or "-",
+                "Frequency": t.frequency,
+            }
+            for t in pending
+        ])
+    else:
+        st.info("No pending tasks found.")
+
     plan = scheduler.generate_plan()
 
-    if not plan:
-        st.warning(scheduler.explain_plan())
+    conflicts = scheduler.detect_conflicts()
+    if conflicts:
+        st.warning("Conflicts detected in your schedule. Please adjust task times:")
+        for warn in conflicts:
+            st.warning(warn)
     else:
-        st.write("## Today's Schedule")
-        for item in plan:
-            st.write(f"{item.start_time.strftime('%H:%M')} - {item.end_time.strftime('%H:%M')} | {item.pet.name} | {item.task.title} ({item.task.task_type}) [priority: {item.task.priority}]")
+        st.success("No conflict detected in the planned schedule.")
+
+    if not plan:
+        st.info(scheduler.explain_plan())
+    else:
+        st.success("Today's Schedule")
+        st.table([
+            {
+                "Start": item.start_time.strftime('%H:%M'),
+                "End": item.end_time.strftime('%H:%M'),
+                "Pet": item.pet.name,
+                "Task": item.task.title,
+                "Type": item.task.task_type,
+                "Priority": item.task.priority,
+                "Reason": item.reason,
+            }
+            for item in plan
+        ])
 
         st.write("**Plan score:**", scheduler.score_plan())
         st.write("**Explanation:**", scheduler.explain_plan())

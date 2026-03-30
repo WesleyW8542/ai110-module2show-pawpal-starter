@@ -42,6 +42,83 @@ pip install -r requirements.txt
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
 
+## System Diagram (Mermaid)
+
+```mermaid
+classDiagram
+    class Owner {
+        +str name
+        +float available_hours
+        +dict preferences
+        +List~Pet~ pets
+        +add_pet(pet)
+        +remove_pet(pet_name)
+        +get_pet(pet_name)
+        +get_all_tasks(include_completed=False)
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +int age
+        +str health_notes
+        +List~Task~ tasks
+        +add_task(task)
+        +remove_task(title)
+        +get_tasks(include_completed=False)
+        +summary()
+    }
+
+    class Task {
+        +str title
+        +str task_type
+        +int duration_minutes
+        +str priority
+        +str frequency
+        +date? deadline
+        +bool completed
+        +datetime created_at
+        +mark_complete()
+        +mark_pending()
+        +update_duration(duration_minutes)
+        +update_priority(priority)
+        +priority_weight()
+        +value_density()
+        +is_overdue(reference)
+    }
+
+    class ScheduledTask {
+        +Task task
+        +Pet pet
+        +datetime start_time
+        +datetime end_time
+        +str reason
+        +duration()
+        +conflicts_with(other)
+    }
+
+    class Scheduler {
+        +Owner owner
+        +date date
+        +List~ScheduledTask~ scheduled_items
+        +str explanation
+        +get_pending_tasks()
+        +get_tasks_sorted()
+        +_select_tasks_for_capacity(tasks, capacity_minutes)
+        +generate_plan(start_time=None)
+        +detect_conflicts()
+        +explain_plan()
+        +score_plan()
+    }
+
+    Owner "1" -- "*" Pet : owns
+    Owner "1" -- "*" Task : has
+    Pet "1" -- "*" Task : owns
+    Scheduler "1" -- "1" Owner
+    Scheduler "1" -- "*" ScheduledTask
+    ScheduledTask "1" -- "1" Task
+```
+
 ## Smarter Scheduling
 
 PawPal+ now includes smarter scheduling capabilities:
@@ -51,6 +128,14 @@ PawPal+ now includes smarter scheduling capabilities:
 - recurring task handling: `daily`/`weekly` tasks automatically create a next occurrence when completed
 - conflict detection via `ScheduledTask.conflicts_with`, returning warnings instead of exceptions
 - explanation supports warnings so the app can alert the user if overlaps are detected
+
+## 📸 Demo
+
+<a href="/Demo.png" target="_blank">
+  <img src="/Demo.png" alt="PawPal+ demo" style="max-width: 100%; height: auto;" />
+</a>
+
+
 
 ## Testing PawPal+
 
