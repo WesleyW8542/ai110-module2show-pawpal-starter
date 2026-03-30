@@ -101,12 +101,24 @@ classDiagram
 **a. Constraints and priorities**
 
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
+  - Time available (`Owner.available_hours` and summed task durations), so the plan never exceeds the owner's daily capacity.
+  - Priority levels (`Task.priority`), encoded as numeric weights (high, medium, low) to prefer the most important pet care actions.
+  - Optional deadlines (`Task.deadline`) and recurrence frequency (`Task.frequency`), to ensure overdue items are surfaced and daily/weekly tasks roll over.
+  - Conflict avoidance with `ScheduledTask.conflicts_with` for overlapping time slots in the same or different pets.
+  - It also tracks completed state so only pending tasks get scheduled, and supports owner preferences as future extension points.
+
 - How did you decide which constraints mattered most?
+  - I prioritized the constraints that directly affect owner effort and pet welfare: available time and task urgency.
+  - Priority and deadlines align with real-world care needs (e.g., feeding is higher priority than optional grooming when time is scarce).
+  - Recurrence and conflict detection were added next so users can trust the plan is not only feasible but repeatable and non-overlapping.
 
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+  - The scheduler trades perfect global optimality for simplicity and responsiveness. It uses a greedy knapsack-like approach with priority weighting rather than exhaustive search over all task permutations.
+
 - Why is that tradeoff reasonable for this scenario?
+  - Pet owners need fast, understandable schedules in a UX context, not heavy computation. The chosen approach almost always yields practically good plans for the expected small number of tasks and provides clear reasoning and warnings, while keeping the codebase approachable for student project scope.
 
 ---
 

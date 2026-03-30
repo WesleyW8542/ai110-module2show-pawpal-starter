@@ -1,5 +1,5 @@
-﻿from datetime import datetime
-from pawpal_system import Owner, Pet, Task, Scheduler
+﻿from datetime import datetime, timedelta
+from pawpal_system import Owner, Pet, Task, Scheduler, ScheduledTask
 
 owner = Owner(name="Jordan", available_hours=4.0)
 pet1 = Pet(name="Mochi", species="dog", age=3)
@@ -19,13 +19,27 @@ pet1.add_task(task_c)
 scheduler = Scheduler(owner=owner)
 plan = scheduler.generate_plan(start_time=datetime.now().replace(hour=9, minute=0, second=0, microsecond=0))
 
+# Inject a lightweight conflict scenario with two simultaneous tasks.
+conflict_start = datetime.now().replace(hour=11, minute=0, second=0, microsecond=0)
+conflict_end = conflict_start + timedelta(minutes=30)
+conflict_task_a = ScheduledTask(task=task_a, pet=pet1, start_time=conflict_start, end_time=conflict_end)
+conflict_task_b = ScheduledTask(task=task_b, pet=pet2, start_time=conflict_start, end_time=conflict_end)
+
+scheduler.scheduled_items.extend([conflict_task_a, conflict_task_b])
+
 print("Today's Schedule")
 print("================")
-if not plan:
+if not scheduler.scheduled_items:
     print(scheduler.explain_plan())
 else:
-    for item in plan:
+    for item in scheduler.scheduled_items:
         print(f"{item.start_time.strftime('%H:%M')} - {item.end_time.strftime('%H:%M')} | {item.pet.name} | {item.task.title} ({item.task.task_type}) [priority: {item.task.priority}]")
+
+conflict_warnings = scheduler.detect_conflicts()
+if conflict_warnings:
+    print("\nWarning: Conflicts detected:")
+    for warning in conflict_warnings:
+        print("-", warning)
 
 print("\nExplanation:", scheduler.explain_plan())
 print("Plan score:", scheduler.score_plan())
